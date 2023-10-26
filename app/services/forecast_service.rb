@@ -12,7 +12,9 @@ class ForecastService
 
   def with_lat_lon(lat, lon, skip_cache: false)
     key = cache_key('forecast', lat, lon)
-    CachingService.fetch(key, expires_in: 10.minutes, skip_cache: skip_cache) do
+    is_from_cache = Rails.cache.exist?(key)
+
+    cached_data = CachingService.fetch(key, expires_in: 30.minutes, skip_cache: skip_cache) do
       puts "fetching forecast for #{lat},#{lon}"
       query = { lat: lat, lon: lon }
       parsed_response = fetch('/forecast', query)
@@ -26,6 +28,11 @@ class ForecastService
         }
       end
     end
+
+    {
+      forecast_data: cached_data,
+      is_from_cache: is_from_cache
+    }
   end
 
   private
