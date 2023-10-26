@@ -24,14 +24,17 @@ RSpec.describe ForecastService do
         query: hash_including(lat: lat, lon: lon)
       )
 
-      expect(result).to eq([
-                             {
-                               date: 12_345,
-                               temp: 25,
-                               temp_min: 20,
-                               temp_max: 30
-                             }
-                           ])
+      expect(result).to eq({
+                             forecast_data: [
+                               {
+                                 date: 12_345,
+                                 temp: 25,
+                                 temp_min: 20,
+                                 temp_max: 30
+                               }
+                             ],
+                             is_from_cache: false
+                           })
     end
   end
 
@@ -54,6 +57,14 @@ RSpec.describe ForecastService do
       Rails.cache.clear
       service.with_lat_lon(lat, lon, skip_cache: true)
       expect(Rails.cache.exist?(cache_key)).to be false
+    end
+
+    it 'returns is_from_cache as true when data is from cache' do
+      service.with_lat_lon(lat, lon)
+
+      result = service.with_lat_lon(lat, lon)
+
+      expect(result[:is_from_cache]).to be true
     end
   end
 end
