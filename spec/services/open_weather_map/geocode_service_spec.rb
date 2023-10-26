@@ -3,11 +3,12 @@ require 'rails_helper'
 RSpec.describe GeocodeService do
   let(:service) { described_class.new }
   let(:address) { '123 main st, New York, NY' }
+  let(:zipcode) { 12_345 }
   let(:cache_key) { "geocode_#{address.gsub(/\s+/, '_').downcase}" }
 
   let(:fake_http_response) do
     instance_double(HTTParty::Response,
-                    body: JSON.generate(results: [{ geometry: { location: { lat: 'some_lat', lng: 'some_lon' } } }]),
+                    body: JSON.generate(results: [{ geometry: { location: { lat: 43.12345, lng: -72.456 } } }]),
                     code: 200,
                     success?: true)
   end
@@ -26,8 +27,22 @@ RSpec.describe GeocodeService do
       )
 
       expect(result).to eq(
-        lat: 'some_lat',
-        lon: 'some_lon'
+        lat: 43.12345,
+        lon: -72.456
+      )
+    end
+
+    it 'fetches the geolocation using address' do
+      result = service.address(zipcode)
+
+      expect(HTTParty).to have_received(:get).with(
+        'https://maps.googleapis.com/maps/api/geocode/json',
+        query: hash_including(address: zipcode, key: ENV['GOOGLE_MAPS_API_KEY'])
+      )
+
+      expect(result).to eq(
+        lat: 43.12345,
+        lon: -72.456
       )
     end
   end
