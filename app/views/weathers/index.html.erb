@@ -7,7 +7,7 @@
 <% end %>
 
 <% if @forecast_data.present? %>
-  <h3>Here's the Weather Forecast for <%= params[:q] %></h3>
+  <h3>Here's the Weather Forecast for <%= params[:q] %>(zip code: <%= @zip %>)</h3>
   <div class="weather-table">
     <% if @is_from_cache %>
       <span class="cache-info">Note: This forecast data is cached and may not reflect real-time conditions.</span>

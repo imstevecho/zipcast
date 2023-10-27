@@ -4,6 +4,6 @@ module WeathersHelper
   end
 
   def human_readable_time(unix_time)
-    Time.at(unix_time).strftime('%a, %b %d')
+    Time.at(unix_time).strftime('%a, %b %d %I:%M %p')
   end
 end

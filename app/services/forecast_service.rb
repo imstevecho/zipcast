@@ -1,7 +1,5 @@
 class ForecastService
-  include CacheKeyGenerator
   BASE_URL = 'https://api.openweathermap.org/data/2.5'.freeze
-  CACHE_EXPIRATION = 30.minutes.freeze
 
   def initialize
     @options = {
@@ -12,15 +10,13 @@ class ForecastService
   end
 
   # Fetch weather forecast data based on latitude and longitude
-  def with_lat_lon(lat, lon, skip_cache: false)
-    key = cache_key('forecast', lat, lon)
-    is_from_cache = Rails.cache.exist?(key)
-    forecast_data = fetch_with_cache(key, lat, lon, skip_cache)
-
-    {
-      forecast_data: forecast_data,
-      is_from_cache: is_from_cache
-    }
+  def with_lat_lon(lat, lon)
+    Rails.logger.info "Fetching forecast for #{lat}, #{lon}"
+    parsed_response = fetch('/forecast', { lat: lat, lon: lon })
+    parse_forecast(parsed_response['list'])
+  rescue StandardError => e
+    Rails.logger.error "Failed to fetch forecast: #{e.message}"
+    raise
   end
 
   private
@@ -33,17 +29,6 @@ class ForecastService
 
     JSON.parse(response.body).tap do |_parsed_response|
       raise 'API Error' unless response.success?
-    end
-  end
-
-  # Fetch forecast data either from cache or API
-  def fetch_with_cache(key, lat, lon, skip_cache)
-    CachingService.fetch(key, expires_in: CACHE_EXPIRATION, skip_cache: skip_cache) do
-      Rails.logger.info "Fetching forecast for #{lat}, #{lon}"
-      query = { lat: lat, lon: lon }
-      parsed_response = fetch('/forecast', query)
-
-      parse_forecast(parsed_response['list'])
     end
   end
 
