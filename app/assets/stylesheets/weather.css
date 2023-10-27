@@ -44,3 +44,11 @@
 .weather-form {
   width: 300px;
 }
+
+.weather-table {
+  margin-top: 50px;
+}
+
+.weather-no-data {
+  margin-top: 50px;
+}
