@@ -11,6 +11,8 @@ I was not able to find a free API that returns daily temperature high/low. The d
 ## Demo Application
 https://zipcast-7a6162b14230.herokuapp.com
 
+![Screenshot 2023-10-27 at 11 05 24 AM](https://github.com/imstevecho/zipcast/assets/63982/8bfe1266-a67e-42fd-bdce-6fc10b5a381d)
+
 ## Architecture & Libraries
 
 - Ruby on Rails for the backend
